@@ -1,8 +1,12 @@
 //! Program state processor
 
 use {
-    solana_account_info::AccountInfo, solana_msg::msg, solana_program_entrypoint::ProgramResult,
-    solana_program_error::ProgramError, solana_pubkey::Pubkey, std::str::from_utf8,
+    solana_account_info::AccountInfo,
+    solana_msg::msg,
+    solana_program_entrypoint::ProgramResult,
+    solana_program_error::ProgramError,
+    solana_pubkey::Pubkey,
+    std::str::{from_utf8, from_utf8_unchecked},
 };
 
 /// Instruction processor
@@ -11,23 +15,27 @@ pub fn process_instruction(
     accounts: &[AccountInfo],
     input: &[u8],
 ) -> ProgramResult {
-    let account_info_iter = &mut accounts.iter();
-    let mut missing_required_signature = false;
-    for account_info in account_info_iter {
-        if let Some(address) = account_info.signer_key() {
-            msg!("Signed by {:?}", address);
-        } else {
-            missing_required_signature = true;
-        }
-    }
-    if missing_required_signature {
-        return Err(ProgramError::MissingRequiredSignature);
-    }
+    //let account_info_iter = &mut accounts.iter();
 
-    let memo = from_utf8(input).map_err(|err| {
-        msg!("Invalid UTF-8, from byte {}", err.valid_up_to());
-        ProgramError::InvalidInstructionData
-    })?;
+    //let mut missing_required_signature = false;
+    //for account_info in account_info_iter {
+    //    if let Some(address) = account_info.signer_key() {
+    //        msg!("Signed by {:?}", address);
+    //    } else {
+    //        missing_required_signature = true;
+    //    }
+    //}
+    //if missing_required_signature {
+    //    return Err(ProgramError::MissingRequiredSignature);
+    //}
+
+    // let memo = from_utf8(input).map_err(|err| {
+    //     msg!("Invalid UTF-8, from byte {}", err.valid_up_to());
+    //     ProgramError::InvalidInstructionData
+    // })?;
+
+    let memo = unsafe { from_utf8_unchecked(input) };
+
     msg!("Memo (len {}): {:?}", memo.len(), memo);
 
     Ok(())
